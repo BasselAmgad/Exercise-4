@@ -3,8 +3,92 @@
 @{
     ViewData["Title"] = "Home page";
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Client</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Client.styles.css" asp-append-version="true" />
+    <script src="//unpkg.com/alpinejs" defer></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Home Recipes</a>
+            <form class="d-flex">
+                <input class="form-control me-sm-2" type="text" placeholder="Search">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="text-black">
+            <h1 class="mb-3">Recipes</h1>
+        </div>
+    </div>
+    <div>
+        <div id="accordion"
+             x-data="{
+                 selected:[],
+                 recipes: [],
+                 init()
+                 {
+                 fetch('https://localhost:7182/recipes')
+                 .then(response=>
+                response.json())
+                .then(data => 
+                    {
+                        data.forEach(recipe => 
+                        {
+                            recipe.ingredients = recipe.ingredients.split('\n');
+                            recipe.instructions = recipe.instructions.split('\n');
+                        }); 
+                        this.recipes = data;
+                    });
+            }
+            }">
+            <template x-for="recipe in recipes">
+                <div class="card">
+                    <div class="card text-white bg-primary mb-3" x-bind:id="`heading_${recipe.id}`">
+                        <button class="btn btn-lg btn-primary" data-bs-toggle="collapse"
+                                x-bind:data-bs-target="`#collapse_${recipe.id}`"
+                                aria-expanded="false"
+                                x-bind:aria-controls="`collapse_${recipe.id}`">
+                            <span x-text="recipe.title"></span>
+                        </button>
+                    </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+                    <div x-bind:id="`collapse_${recipe.id}`" class="collapse"
+                         x-bind:aria-labelledby="`heading_${recipe.id}`"
+                         data-bs-parent="#accordion">
+                        <div class="card-body">
+                            <h4 class="card-title">Ingredients</h4>
+                            <template x-for="ingredient in recipe.ingredients">
+                                <p class="card-text"><span x-text="'-'+ingredient"></span></p>
+                            </template>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">Instructions</h4>
+                            <template x-for="instruction in recipe.instructions">
+                                <p class="card-text"><span x-text="'-'+instruction"></span></p>
+                            </template>
+                        </div>
+                        <span class="badge badge-pill badge-info">Info</span>
+                        <div class="card-body">
+                            <template x-for="category in recipe.categories">
+                                <span style="font-size:12px" class="badge rounded-pill bg-info text-dark" x-text="category"></span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>
