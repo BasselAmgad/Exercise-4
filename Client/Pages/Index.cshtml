@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Client</title>
+    <title>Home Recipes</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script src="//unpkg.com/alpinejs" defer></script>
@@ -41,6 +41,8 @@
         <div class="row row-cols-md-4 "
              x-data="
              {
+             index:0,
+             selectedRecipe:{id:'',title:'',ingredients:'',instructions:'',categories:[]},
              recipes: [],
              init() {
              fetch('https://localhost:7182/recipes')
@@ -58,8 +60,8 @@
             }
             }">
             <template x-for="recipe in recipes">
-                <div class="col">
-                    <div class="card" style="">
+                    <div x-data="{cardRecipe:{},init(){this.cardRecipe = recipes[index++]}}">
+                    <div class="card">
                         <div class="card text-dark bg-light mb-3" x-bind:id="`heading_${recipe.id}`">
                             <div class="card-header">
                                 <div class="d-grid">
@@ -67,9 +69,8 @@
                                             x-bind:data-bs-target="`#collapse_${recipe.id}`"
                                             aria-expanded="false"
                                             x-bind:aria-controls="`collapse_${recipe.id}`">
-                                        <span x-text="recipe.title"></span>
+                                            <span x-text="recipe.title"></span>
                                     </button>
-
                                 </div>
                             </div>
                             <footer>
@@ -78,11 +79,9 @@
                                 </template>
                             </footer>
                         </div>
-
                         <div x-bind:id="`collapse_${recipe.id}`" class="collapse"
                              x-bind:aria-labelledby="`heading_${recipe.id}`"
                              data-bs-parent="#accordion">
-
                             <div class="list-group">
                                 <div class="card-body text-dark list-group-item">
                                     <h5 class="card-title">Instructions</h5>
@@ -92,7 +91,6 @@
                                         </template>
                                     </ol>
                                 </div>
-
                                 <div class="card-body text-dark list-group-item">
                                     <h5 class="card-title">Ingredients</h5>
                                     <ol class="list-group">
@@ -102,12 +100,42 @@
                                     </ol>
                                 </div>
                                 <button type="button" class="btn btn btn-secondary">Edit</button>
-                                <button type="button" class="btn btn btn-danger">Delete</button>
+                                <button x-on:click="selectedRecipe=cardRecipe" 
+                                data-bs-toggle="modal" data-bs-target="#deleteRecipeModal"
+                                type="button" class="btn btn btn-danger">Delete</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </template>
+
+        @*Modal for Delete Recipe*@
+        <div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-labelledby="deleteRecipeLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteRecipeLabel">Delete Recipe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                        <form id="deleteRecipe-form" x-on:submit="
+                              fetch(`https://localhost:7182/recipes/${selectedRecipe.id}`, {
+                              method: 'DELETE' ,
+                              headers: {
+                              'Content-Type' : 'application/json' ,
+                              }
+                              })">
+                            <p>Are you sure you want to delete <span x-text="selectedRecipe.title"></span></p>
+                        </form>
+                        </div>
+                        <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="deleteRecipe-form" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+          </div>
+        </div>
+
         </div>
     </div>
 
@@ -194,8 +222,8 @@
                 <div class="modal-body">
                     <div x-data=" {category:''}">
                         <form id="addCategory-form"
-                              x-on:submit.prevent="
-                              fetch(`https: //localhost:7182/categories?category =${category}`, {
+                              x-on:submit="
+                              fetch(`https://localhost:7182/categories?category=${category}`, {
                               method: 'POST' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
