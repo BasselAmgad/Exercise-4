@@ -22,7 +22,8 @@
                 Add Recipe
             </button>
 
-            <button class="btn btn-secondary my-2 my-sm-0">Add Category</button>
+            <button class="btn btn-secondary my-2 my-sm-0"
+            data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
             <form class="d-flex">
                 <input class="form-control me-sm-2" type="text" placeholder="Search">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
@@ -108,7 +109,7 @@
     </div>
 
     @*Modal for Add Recipe*@
-    <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -177,6 +178,46 @@
         </div>
     </div>
 
+    @*Modal for Add Category*@
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div x-data=" {category:''}">
+                        <form id="addCategory-form" 
+                        x-on:submit.prevent="
+                            fetch(`https://localhost:7182/categories?category=${category}`, {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              }})
+                            .then(response => response.json())
+                            .then(data => {
+                              console.log('Success:', data);
+                            })
+                            .catch((error) => {
+                              console.error('Error:', error);
+                            });
+                        ">
+                            <div class="mb-3">
+                                <label for="category-text" class="col-form-label">Category Name</label>
+                                <input x-model="category" type="text" class="form-control" id="category-text">
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="addCategory-form" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
