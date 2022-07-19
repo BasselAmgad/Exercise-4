@@ -18,7 +18,12 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Home Recipes</a>
-            <button type="button" class="btn btn-outline-secondary">Add Recipe</button>
+            <button class="btn btn-secondary my-2 my-sm-0"
+                    data-bs-toggle="modal" data-bs-target="#addRecipeModal">
+                Add Recipe
+            </button>
+
+            <button class="btn btn-secondary my-2 my-sm-0">Add Category</button>
             <form class="d-flex">
                 <input class="form-control me-sm-2" type="text" placeholder="Search">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
@@ -33,22 +38,22 @@
     <div>
         <div class="card-group"
              x-data="{
-                 selected:[],
-                 recipes: [],
-                 init()
-                 {
-                 fetch('https://localhost:7182/recipes')
-                 .then(response=>
-                response.json())
-                .then(data => 
-                    {
-                        data.forEach(recipe => 
-                        {
-                            recipe.ingredients = recipe.ingredients.split('\n');
-                            recipe.instructions = recipe.instructions.split('\n');
-                        }); 
-                        this.recipes = data;
-                    });
+             selected:[],
+             recipes: [],
+             init()
+             {
+             fetch('https://localhost:7182/recipes')
+             .then(response=>
+            response.json())
+            .then(data =>
+            {
+            data.forEach(recipe =>
+            {
+            recipe.ingredients = recipe.ingredients.split('\n');
+            recipe.instructions = recipe.instructions.split('\n');
+            });
+            this.recipes = data;
+            });
             }
             }">
             <template x-for="recipe in recipes">
@@ -57,10 +62,10 @@
                         <div class="card-header">
                             <div class="d-grid">
                                 <button class="btn btn-outline-secondary btn-lg" data-bs-toggle="collapse"
-                                    x-bind:data-bs-target="`#collapse_${recipe.id}`"
-                                    aria-expanded="false"
-                                    x-bind:aria-controls="`collapse_${recipe.id}`">
-                                <span x-text="recipe.title"></span>
+                                        x-bind:data-bs-target="`#collapse_${recipe.id}`"
+                                        aria-expanded="false"
+                                        x-bind:aria-controls="`collapse_${recipe.id}`">
+                                    <span x-text="recipe.title"></span>
                                 </button>
                             </div>
                         </div>
@@ -69,7 +74,7 @@
                     <div x-bind:id="`collapse_${recipe.id}`" class="collapse"
                          x-bind:aria-labelledby="`heading_${recipe.id}`"
                          data-bs-parent="#accordion">
-                      
+
                         <div class="list-group">
                             <div class="card-body text-dark list-group-item">
                                 <h5 class="card-title">Instructions</h5>
@@ -79,13 +84,13 @@
                                     </template>
                                 </ol>
                             </div>
-                         
+
                             <div class="card-body text-dark list-group-item">
                                 <h5 class="card-title">Ingredients</h5>
                                 <ol class="list-group">
-                                <template x-for="ingredient in recipe.ingredients">
-                                    <ui class="list-group-item"><span x-text="ingredient"></span></ui>
-                                </template>
+                                    <template x-for="ingredient in recipe.ingredients">
+                                        <ui class="list-group-item"><span x-text="ingredient"></span></ui>
+                                    </template>
                                 </ol>
                             </div>
 
@@ -102,6 +107,59 @@
             </template>
         </div>
     </div>
+
+    <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Recipe</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div x-data="
+                         {
+                            allCategories:[],
+                            Recipe:{Title:'',Ingredients:'',Instructions:'',Categories:[]},
+                            init(){
+                                fetch('https://localhost:7182/categories')
+                                .then(response=>response.json()
+                                .then(data=>this.allCategories = data))
+                            }
+                         }">
+                        <form>
+                            <div class="mb-3">
+                                <label for="title-text" class="col-form-label">Title</label>
+                                <input type="text" class="form-control" id="title-text">
+                            </div>
+                            <div class="mb-3">
+                                <label for="ingredients-text" class="col-form-label">Ingredients</label>
+                                <textarea class="form-control" id="ingredients-text"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="instructions-text" class="col-form-label">Instructions</label>
+                                <textarea class="form-control" id="Instructions-text"></textarea>
+                            </div>
+                            <div>
+                                <label class="col-form-label">Categories</label>
+                                <select class="form-select" multiple aria-label="multiple select example">
+                                    <template x-for="category in allCategories">
+                                        <option x-bind:value="category" x-bind:label="category"></option>
+                                    </template>
+                                </select>  
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
