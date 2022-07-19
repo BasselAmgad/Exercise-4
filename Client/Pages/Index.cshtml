@@ -23,7 +23,9 @@
             </button>
 
             <button class="btn btn-secondary my-2 my-sm-0"
-            data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
+                    data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                Add Category
+            </button>
             <form class="d-flex">
                 <input class="form-control me-sm-2" type="text" placeholder="Search">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
@@ -36,70 +38,71 @@
         </div>
     </div>
     <div>
-        <div class="card-group"
+        <div class="row row-cols-md-4 "
              x-data="
+             {
+             recipes: [],
+             init() {
+             fetch('https://localhost:7182/recipes')
+             .then(response=>
+            response.json())
+            .then(data =>
             {
-                selected:[],
-                recipes: [],
-                init() {
-                    fetch('https://localhost:7182/recipes')
-                    .then(response=>
-                    response.json())
-                    .then(data =>
-                    {
-                        data.forEach(recipe =>
-                        {
-                            recipe.ingredients = recipe.ingredients.split('\n');
-                            recipe.instructions = recipe.instructions.split('\n');
-                        });
-                        this.recipes = data;
-                    });
-                }
+            data.forEach(recipe =>
+            {
+            recipe.ingredients = recipe.ingredients.split('\n');
+            recipe.instructions = recipe.instructions.split('\n');
+            });
+            this.recipes = data;
+            });
+            }
             }">
             <template x-for="recipe in recipes">
-                <div class="card">
-                    <div class="card text-dark bg-light mb-3" x-bind:id="`heading_${recipe.id}`">
-                        <div class="card-header">
-                            <div class="d-grid">
-                                <button class="btn btn-outline-secondary btn-lg" data-bs-toggle="collapse"
-                                        x-bind:data-bs-target="`#collapse_${recipe.id}`"
-                                        aria-expanded="false"
-                                        x-bind:aria-controls="`collapse_${recipe.id}`">
-                                    <span x-text="recipe.title"></span>
-                                </button>
+                <div class="col">
+                    <div class="card" style="">
+                        <div class="card text-dark bg-light mb-3" x-bind:id="`heading_${recipe.id}`">
+                            <div class="card-header">
+                                <div class="d-grid">
+                                    <button class="btn btn-outline-secondary btn-lg" data-bs-toggle="collapse"
+                                            x-bind:data-bs-target="`#collapse_${recipe.id}`"
+                                            aria-expanded="false"
+                                            x-bind:aria-controls="`collapse_${recipe.id}`">
+                                        <span x-text="recipe.title"></span>
+                                    </button>
+
+                                </div>
                             </div>
+                            <footer>
+                                <template x-for="category in recipe.categories">
+                                    <span style="font-size:12px" class="badge rounded-pill bg-secondary" x-text="category"></span>
+                                </template>
+                            </footer>
                         </div>
-                    </div>
 
-                    <div x-bind:id="`collapse_${recipe.id}`" class="collapse"
-                         x-bind:aria-labelledby="`heading_${recipe.id}`"
-                         data-bs-parent="#accordion">
+                        <div x-bind:id="`collapse_${recipe.id}`" class="collapse"
+                             x-bind:aria-labelledby="`heading_${recipe.id}`"
+                             data-bs-parent="#accordion">
 
-                        <div class="list-group">
-                            <div class="card-body text-dark list-group-item">
-                                <h5 class="card-title">Instructions</h5>
-                                <ol class="list-group list-group-numbered">
-                                    <template x-for="instruction in recipe.instructions">
-                                        <li class="list-group-item" x-text="instruction"></li>
-                                    </template>
-                                </ol>
-                            </div>
+                            <div class="list-group">
+                                <div class="card-body text-dark list-group-item">
+                                    <h5 class="card-title">Instructions</h5>
+                                    <ol class="list-group list-group-numbered">
+                                        <template x-for="instruction in recipe.instructions">
+                                            <li class="list-group-item" x-text="instruction"></li>
+                                        </template>
+                                    </ol>
+                                </div>
 
-                            <div class="card-body text-dark list-group-item">
-                                <h5 class="card-title">Ingredients</h5>
-                                <ol class="list-group">
-                                    <template x-for="ingredient in recipe.ingredients">
-                                        <ui class="list-group-item"><span x-text="ingredient"></span></ui>
-                                    </template>
-                                </ol>
-                            </div>
-
-                            <div class="card-body list-group-item">
-                                <footer>
-                                    <template x-for="category in recipe.categories">
-                                        <span style="font-size:12px" class="badge rounded-pill bg-secondary" x-text="category"></span>
-                                    </template>
-                                </footer>
+                                <div class="card-body text-dark list-group-item">
+                                    <h5 class="card-title">Ingredients</h5>
+                                    <ol class="list-group">
+                                        <template x-for="ingredient in recipe.ingredients">
+                                            <ui class="list-group-item"><span x-text="ingredient"></span></ui>
+                                        </template>
+                                    </ol>
+                                </div>
+                                <button type="button" class="btn btn btn-secondary">Edit</button>
+                                <button type="button" class="btn btn btn-danger">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -119,53 +122,55 @@
                 <div class="modal-body">
                     <div x-data="
                          {
-                            allCategories:[],
-                            recipe:{Title:'',Ingredients:'',Instructions:'',Categories:[]},
-                            init() {
-                                fetch('https://localhost:7182/categories')
-                                    .then(response=>response.json()
-                                    .then(data=>this.allCategories = data))
-                            }
-                         }">
-                        <form id="addRecipe-form" 
-                        x-on:submit="
-                            fetch('https://localhost:7182/recipes', {
-                              method: 'POST',
+                         allCategories:[],
+                         recipe:{Title:'',Ingredients:'',Instructions:'',Categories:[]},
+                         init() {
+                         fetch('https://localhost:7182/categories')
+                         .then(response=>
+                        response.json()
+                        .then(data=>this.allCategories = data))
+                        }
+                        }">
+                        <form id="addRecipe-form"
+                              x-on:submit="
+                              fetch('https://localhost:7182/recipes', {
+                              method: 'POST' ,
                               headers: {
-                                'Content-Type': 'application/json',
+                              'Content-Type' : 'application/json' ,
                               },
                               body: JSON.stringify(recipe),
-                            })
-                            .then(response => response.json())
+                              })
+                              .then(response=>
+                            response.json())
                             .then(data => {
-                              console.log('Success:', data);
+                            console.log('Success:', data);
                             })
                             .catch((error) => {
-                              console.error('Error:', error);
+                            console.error('Error:', error);
                             });
-                        ">
-                            <div class="mb-3">
+                            ">
+                            <div class="form-floating mb-3">
+                                <input x-model="recipe.Title" type="text" class="form-control" id="title-text" placeholder="Scrambled Eggs">
                                 <label for="title-text" class="col-form-label">Title</label>
-                                <input x-model="recipe.Title" type="text" class="form-control" id="title-text">
                             </div>
-                            <div class="mb-3">
+                            <div class="form-floating mb-3">
+                                <textarea x-model="recipe.Ingredients"
+                                          class="form-control" id="ingredients-text" minlength="5"></textarea>
                                 <label for="ingredients-text" class="col-form-label">Ingredients</label>
-                                <textarea x-model="recipe.Ingredients" 
-                                class="form-control" id="ingredients-text" minlength="5"></textarea>
                             </div>
-                            <div class="mb-3">
-                                <label for="instructions-text" class="col-form-label">Instructions</label>
+                            <div class="form-floating mb-3">
                                 <textarea x-model="recipe.Instructions"
-                                class="form-control" id="Instructions-text" minlength="5"></textarea>
+                                          class="form-control" id="Instructions-text" minlength="5"></textarea>
+                                <label for="instructions-text" class="col-form-label">Instructions</label>
                             </div>
                             <div>
                                 <label class="col-form-label">Categories</label>
-                                <select x-model="recipe.Categories"
-                                class="form-select" multiple aria-label="multiple select example">
+                                <select x-model="recipe.Categories" id="categoriesSelect"
+                                        class="form-select" multiple aria-label="multiple select example">
                                     <template x-for="category in allCategories">
                                         <option x-bind:value="category" x-bind:label="category"></option>
                                     </template>
-                                </select>  
+                                </select>
                             </div>
                         </form>
                     </div>
@@ -188,26 +193,27 @@
                 </div>
                 <div class="modal-body">
                     <div x-data=" {category:''}">
-                        <form id="addCategory-form" 
-                        x-on:submit.prevent="
-                            fetch(`https://localhost:7182/categories?category=${category}`, {
-                              method: 'POST',
+                        <form id="addCategory-form"
+                              x-on:submit.prevent="
+                              fetch(`https: //localhost:7182/categories?category =${category}`, {
+                              method: 'POST' ,
                               headers: {
-                                'Content-Type': 'application/json',
+                              'Content-Type' : 'application/json' ,
                               }})
-                            .then(response => response.json())
+                              .then(response=>
+                            response.json())
                             .then(data => {
-                              console.log('Success:', data);
+                            console.log('Success:', data);
                             })
                             .catch((error) => {
-                              console.error('Error:', error);
+                            console.error('Error:', error);
                             });
-                        ">
+                            ">
                             <div class="mb-3">
                                 <label for="category-text" class="col-form-label">Category Name</label>
                                 <input x-model="category" type="text" class="form-control" id="category-text">
                             </div>
-                            
+
                         </form>
                     </div>
                 </div>
