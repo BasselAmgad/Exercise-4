@@ -10,4 +10,8 @@
     <None Include="wwwroot\images\background.jpg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SweetAlert" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>
