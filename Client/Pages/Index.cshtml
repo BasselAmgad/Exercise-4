@@ -9,35 +9,43 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home Recipes</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+<body background="/images/background.jpg">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Home Recipes</a>
-            <button class="btn btn-secondary my-2 my-sm-0"
-                    data-bs-toggle="modal" data-bs-target="#addRecipeModal">
-                Add Recipe
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
-
-            <button class="btn btn-secondary my-2 my-sm-0"
-                    data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                Add Category
-            </button>
-            <form class="d-flex">
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Recipes</a>
+                    <div class="dropdown-menu">
+                    <button class="dropdown-item" >View Recipes</button>
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addRecipeModal">Add Recipe</button>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Categories</a>
+                    <div class="dropdown-menu">
+                    <button class="dropdown-item" >View Categories</button>
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
+                    </div>
+                </li>
+                </ul>
+                <form class="d-flex">
                 <input class="form-control me-sm-2" type="text" placeholder="Search">
                 <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-            </form>
+                </form>
+            </div>
         </div>
     </nav>
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <div class="text-black">
-            <h1 class="mb-3">Recipes</h1>
-        </div>
-    </div>
-    <div>
+    <h1 class="text-center my-4" style="color:white">Recipes</h1>
+    <div class="container" >
         <div class="row row-cols-md-4 "
              x-data="
              {
@@ -45,7 +53,7 @@
              selectedRecipe:{id:'',title:'',ingredients:'',instructions:'',categories:[]},
              recipes: [],
              init() {
-             fetch('https://localhost:7182/recipes')
+             fetch(`https://localhost:7182/recipes`)
              .then(response=>
             response.json())
             .then(data =>
@@ -60,24 +68,25 @@
             }
             }">
             <template x-for="recipe in recipes">
-                    <div x-data="{cardRecipe:{},init(){this.cardRecipe = recipes[index++]}}">
-                    <div class="card">
-                        <div class="card text-dark bg-light mb-3" x-bind:id="`heading_${recipe.id}`">
+                <div x-data="{cardRecipe:{},init(){this.cardRecipe = recipes[index++]}}">
+                    <div class="">
+                        <div class="card card text-white bg-primary mb-3" x-bind:id="`heading_${recipe.id}`">
                             <div class="card-header">
                                 <div class="d-grid">
-                                    <button class="btn btn-outline-secondary btn-lg" data-bs-toggle="collapse"
+                                    <button class="btn btn-lg btn-primary" data-bs-toggle="collapse"
                                             x-bind:data-bs-target="`#collapse_${recipe.id}`"
                                             aria-expanded="false"
                                             x-bind:aria-controls="`collapse_${recipe.id}`">
-                                            <span x-text="recipe.title"></span>
+                                        <h4><span x-text="recipe.title"></span></h4>
                                     </button>
                                 </div>
-                            </div>
-                            <footer>
                                 <template x-for="category in recipe.categories">
-                                    <span style="font-size:12px" class="badge rounded-pill bg-secondary" x-text="category"></span>
+                                    <span style="font-size:12px; margin-top:5px; margin-right: 5px;" class="badge rounded-pill bg-light" x-text="category"></span>
                                 </template>
-                            </footer>
+                            </div>
+
+
+
                         </div>
                         <div x-bind:id="`collapse_${recipe.id}`" class="collapse"
                              x-bind:aria-labelledby="`heading_${recipe.id}`"
@@ -100,41 +109,43 @@
                                     </ol>
                                 </div>
                                 <button type="button" class="btn btn btn-secondary">Edit</button>
-                                <button x-on:click="selectedRecipe=cardRecipe" 
-                                data-bs-toggle="modal" data-bs-target="#deleteRecipeModal"
-                                type="button" class="btn btn btn-danger">Delete</button>
+                                <button x-on:click="selectedRecipe=cardRecipe"
+                                        data-bs-toggle="modal" data-bs-target="#deleteRecipeModal"
+                                        type="button" class="btn btn btn-danger">
+                                    Delete
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </template>
 
-        @*Modal for Delete Recipe*@
-        <div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-labelledby="deleteRecipeLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteRecipeLabel">Delete Recipe</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            @*Modal for Delete Recipe*@
+            <div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-labelledby="deleteRecipeLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteRecipeLabel">Delete Recipe</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                        <form id="deleteRecipe-form" x-on:submit="
+                            <form id="deleteRecipe-form" x-on:submit="
                               fetch(`https://localhost:7182/recipes/${selectedRecipe.id}`, {
                               method: 'DELETE' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
                               }
                               })">
-                            <p>Are you sure you want to delete <span x-text="selectedRecipe.title"></span></p>
-                        </form>
+                                <p>Are you sure you want to delete <span x-text="selectedRecipe.title"></span></p>
+                            </form>
                         </div>
                         <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="deleteRecipe-form" class="btn btn-danger">Delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" form="deleteRecipe-form" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-          </div>
-        </div>
 
         </div>
     </div>
@@ -153,7 +164,7 @@
                          allCategories:[],
                          recipe:{Title:'',Ingredients:'',Instructions:'',Categories:[]},
                          init() {
-                         fetch('https://localhost:7182/categories')
+                         fetch(`https://localhost:7182/categories`)
                          .then(response=>
                         response.json()
                         .then(data=>this.allCategories = data))
@@ -161,7 +172,7 @@
                         }">
                         <form id="addRecipe-form"
                               x-on:submit="
-                              fetch('https://localhost:7182/recipes', {
+                              fetch(`https://localhost:7182/recipes`, {
                               method: 'POST' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
@@ -223,7 +234,7 @@
                     <div x-data=" {category:''}">
                         <form id="addCategory-form"
                               x-on:submit="
-                              fetch(`https://localhost:7182/categories?category=${category}`, {
+                              fetch(`https://localhost:7182/categories?category =${category}`, {
                               method: 'POST' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
