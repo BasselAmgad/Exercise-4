@@ -15,6 +15,7 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body background="/images/background.jpg">
+    @*Navbar*@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Home Recipes</a>
@@ -23,30 +24,32 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarColor01">
                 <ul class="navbar-nav me-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Recipes</a>
-                    <div class="dropdown-menu">
-                    <button class="dropdown-item" >View Recipes</button>
-                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addRecipeModal">Add Recipe</button>
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Categories</a>
-                    <div class="dropdown-menu">
-                    <button class="dropdown-item" >View Categories</button>
-                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
-                    </div>
-                </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" style="color:whitesmoke" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Recipes</a>
+                        <div class="dropdown-menu">
+                            <button class="dropdown-item">View Recipes</button>
+                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addRecipeModal">Add Recipe</button>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" style="color:whitesmoke" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Categories</a>
+                        <div class="dropdown-menu">
+                            <button class="dropdown-item">View Categories</button>
+                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
+                        </div>
+                    </li>
                 </ul>
                 <form class="d-flex">
-                <input class="form-control me-sm-2" type="text" placeholder="Search">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                    <input class="form-control me-sm-2" type="text" placeholder="Search">
+                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </div>
         </div>
     </nav>
     <h1 class="text-center my-4" style="color:white">Recipes</h1>
-    <div class="container" >
+
+    @*View Recipes*@
+    <div class="container">
         <div class="row row-cols-md-4 "
              x-data="
              {
@@ -109,10 +112,16 @@
                                         </template>
                                     </ol>
                                 </div>
-                                <button type="button" class="btn btn btn-secondary">Edit</button>
-                                <button x-on:click="selectedRecipe=cardRecipe"
-                                        data-bs-toggle="modal" data-bs-target="#deleteRecipeModal"
-                                        type="button" class="btn btn btn-danger">
+                                <button x-on:click="selectedRecipe = {...cardRecipe};
+                                                    selectedRecipe.ingredients=selectedRecipe.ingredients.join('\n');
+                                                    selectedRecipe.instructions=selectedRecipe.instructions.join('\n');" 
+                                data-bs-toggle="modal" data-bs-target="#editRecipeModal" 
+                                type="button" class="btn btn btn-secondary">
+                                    Edit
+                                </button>
+                                <button x-on:click="selectedRecipe={...cardRecipe}"
+                                data-bs-toggle="modal" data-bs-target="#deleteRecipeModal"
+                                type="button" class="btn btn btn-danger">
                                     Delete
                                 </button>
                             </div>
@@ -131,7 +140,7 @@
                         </div>
                         <div class="modal-body">
                             <form id="deleteRecipe-form" x-on:submit="
-                              fetch(`https://localhost:7182/recipes/${selectedRecipe.id}`, {
+                              fetch(`https://localhost:7182/recipes/{selectedRecipe.id}`, {
                               method: 'DELETE' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
@@ -143,6 +152,81 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" form="deleteRecipe-form" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*Modal for Edit Recipe*@
+            <div class="modal fade" id="editRecipeModal" tabindex="-1" aria-labelledby="editRecipeLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editRecipeLabel">Edit Recipe</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div x-data="
+                                 {
+                                 allCategories:[],
+                                 newInstructions:'',
+                                 newIngredients:'',
+                                 init() {
+                                 fetch(`https://localhost:7182/categories`)
+                                 .then(response=>
+                                response.json()
+                                .then(data=>this.allCategories = data))
+                                }
+                                }">
+                                <form id="editRecipe-form"
+                                      x-on:submit="
+                                      fetch(`https://localhost:7182/recipes/${selectedRecipe.id}`, {
+                                      method: 'PUT' ,
+                                      headers: {
+                                      'Content-Type' : 'application/json' ,
+                                      },
+                                      body: JSON.stringify(selectedRecipe),
+                                      })
+                                      .then(response=>
+                                        response.json())
+                                        .then(data => {
+                                        console.log('Success:', data);
+                                        })
+                                        .catch((error) => {
+                                        console.error('Error:', error);
+                                        });
+                                    ">
+                                    <div class="form-floating mb-3">
+                                        <input x-model="selectedRecipe.title"
+                                        type="text" class="form-control" id="title-text" >
+                                        <label for="title-text" class="col-form-label">Title</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <textarea x-model="selectedRecipe.ingredients" 
+                                                  class="form-control" id="ingredients-text" minlength="5"></textarea>
+                                        <label for="ingredients-text" class="col-form-label">Ingredients</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <textarea x-model="selectedRecipe.instructions"
+                                                  class="form-control" id="Instructions-text" minlength="5"></textarea>
+                                        <label for="instructions-text" class="col-form-label">Instructions</label>
+                                    </div>
+                                    <div>
+                                        <label class="col-form-label">Categories</label>
+                                        <select x-model="selectedRecipe.categories" id="categoriesSelect"
+                                                class="form-select" multiple aria-label="multiple select example">
+                                            <template x-for="category in allCategories">
+                                                <option x-bind:value="category" x-bind:selected="selectedRecipe.categories.includes(category)?true:false" 
+                                                x-bind:label="category"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" form="editRecipe-form" class="btn btn-danger">Edit</button>
                         </div>
                     </div>
                 </div>
