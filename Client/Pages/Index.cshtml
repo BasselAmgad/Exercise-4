@@ -240,6 +240,8 @@
 
     @*categories view*@
     <div x-data="{allCategories:[],
+                 index:0,
+                 selectedCategory:'',
                  init(){
                     fetch(`https://localhost:7182/categories`)
                     .then(response=> response.json()
@@ -249,17 +251,18 @@
         <div x-data class="container">
             <div class="row row-cols-auto justify-content-center g-4">
 	            <template x-for="category in allCategories">
-		            <div class="col">
+		            <div class="col" x-data="{cardCategory:'',init(){this.cardCategory = allCategories[index++]}}">
 			            <div class="card text-center">
 				            <div class="card-body">
 					            <h5 class="card-title"><span x-text="category"></span></h5>
 					            <div class="btn-group">
-						            <a class="btn btn-primary">
+						            <button class="btn btn-primary">
 							            <i class="bi bi-pencil-square"></i>
-						            </a>
-						            <a class="btn btn-danger">
+						            </button>
+						            <button x-on:click="selectedCategory = cardCategory"
+                                    data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"class="btn btn-danger">
 							            <i class="bi bi-trash"></i>
-						            </a>
+						            </button>
 					            </div>
 				            </div>
 			            </div>
@@ -267,6 +270,33 @@
 	            </template>
             </div>
         </div>
+
+         @*Modal for Delete Category*@
+            <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteCategoryLabel">Delete Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="deleteCategory-form" x-on:submit="
+                              fetch(`https://localhost:7182/categories/?category={selectedCategory}`, {
+                              method: 'DELETE' ,
+                              headers: {
+                              'Content-Type' : 'application/json' ,
+                              }
+                              })">
+                                <p>Are you sure you want to delete <span x-text="selectedCategory"></span></p>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" form="deleteRecipe-form" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </div>
 
     @*Modal for Add Recipe*@
