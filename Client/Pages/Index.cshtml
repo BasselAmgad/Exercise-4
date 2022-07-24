@@ -256,7 +256,8 @@
 				            <div class="card-body">
 					            <h5 class="card-title"><span x-text="category"></span></h5>
 					            <div class="btn-group">
-						            <button class="btn btn-primary">
+						            <button x-on:click="selectedCategory = cardCategory"
+                                    data-bs-toggle="modal" data-bs-target="#editCategoryModal" class="btn btn-primary">
 							            <i class="bi bi-pencil-square"></i>
 						            </button>
 						            <button x-on:click="selectedCategory = cardCategory"
@@ -293,6 +294,36 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" form="deleteRecipe-form" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*Modal for edit Category*@
+            <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editCategoryLabel">Edit Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" x-data="{newCategory:''}">
+                            <form id="editCategory-form" x-on:submit="
+                              fetch(`https://localhost:7182/categories/?category={selectedCategory}&newCategory={newCategory}`, {
+                              method: 'PUT' ,
+                              headers: {
+                              'Content-Type' : 'application/json' ,
+                              }
+                              })">
+                                <div class="form-floating mb-3">
+                                <input x-model="newCategory" type="text" class="form-control" id="category-text">
+                                <label for="category-text" class="col-form-label">New title for "<span x-text="selectedCategory"></span>"</label>
+                            </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" form="editRecipe-form" class="btn btn-danger">Edit</button>
                         </div>
                     </div>
                 </div>
