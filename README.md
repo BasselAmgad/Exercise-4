@@ -6,9 +6,11 @@
 ## The project uses the following
 - [Alpine.js](https://alpinejs.dev/)
 - [Bootstrap 5](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
+- [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 
 ## Project Structure
 - The whole project is just the [Index.cshtml](https://github.com/BasselAmgad/Exercise-4/blob/master/Client/Pages/Index.cshtml).
+- Fetch API is used to connect to the [Recipes API](https://github.com/BasselAmgad/Exercise-3/blob/master/Server/Program.cs).
 
 ## Functionality
 * List, add, delete and edit recipes.
