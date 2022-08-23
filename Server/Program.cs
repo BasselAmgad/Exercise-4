@@ -82,7 +82,7 @@ app.MapPost("/categories", async (HttpContext context, IAntiforgery antiForgery,
         await antiForgery.ValidateRequestAsync(context);
     }catch(Exception e)
     {
-        Console.WriteLine("Hello "+antiForgery.ToString());
+        Console.WriteLine(antiForgery.ToString());
         Console.WriteLine(e.Message);
     }
     
