@@ -5,11 +5,11 @@ namespace Client.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
+        public string Url;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(IConfiguration configuration)
         {
-            _logger = logger;
+            Url = configuration["Url"];
         }
 
         public void OnGet()

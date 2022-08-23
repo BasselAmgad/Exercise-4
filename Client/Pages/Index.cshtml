@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Home page";
     var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+    var recipeUrl = @Url + "recipes";
+    var categoryUrl = @Url + "categories";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -359,7 +361,7 @@
 
 <script type="text/javascript">
     async function getRecipes() {
-        let data = await fetch(`https://localhost:7182/recipes`)
+        let data = await fetch('@recipeUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } })
             .then(response => response.json())
         data.forEach(recipe => {
             recipe.ingredients = recipe.ingredients.split('\n');
@@ -369,17 +371,18 @@
     }
 
     async function getCategories() {
-        let categories = await fetch(`https://localhost:7182/categories`)
+        let categories = await fetch('@categoryUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } })
             .then(response => response.json());
         return categories;
     }
 
     async function addRecipe(recipe) {
         console.log(recipe);
-        await fetch(`https://localhost:7182/recipes`, {
+        await fetch(`@recipeUrl`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'RequestVerificationToken': '@requestToken',
             },
             body: JSON.stringify(recipe),
         })
@@ -398,6 +401,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'RequestVerificationToken': '@requestToken',
             }
         })
             .then(response =>
@@ -411,10 +415,11 @@
     }
 
     async function deleteRecipe(recipe) {
-        fetch(`https://localhost:7182/recipes/${recipe.id}`, {
+        fetch(`@recipeUrl/${recipe.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                'RequestVerificationToken': '@requestToken',
             }
         })
             .then(response =>
@@ -428,10 +433,11 @@
     }
 
     async function deleteCategory(category) {
-        fetch(`https://localhost:7182/categories/?category=${category}`, {
+        fetch(`@categoryUrl/?category=${category}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                'RequestVerificationToken': '@requestToken',
             }
         })
             .then(response =>
@@ -445,10 +451,11 @@
     }
 
     async function editRecipe(recipe) {
-        fetch(`https://localhost:7182/recipes/${recipe.id}`, {
+        fetch(`@recipeUrl/${recipe.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'RequestVerificationToken': '@requestToken',
             },
             body: JSON.stringify(recipe),
         })
@@ -464,10 +471,11 @@
     }
 
     async function editCategory(category, newCategory) {
-        fetch(`https://localhost:7182/categories/?category=${category}&newCategory=${newCategory}`, {
+        fetch(`@categoryUrl/?category=${category}&newCategory=${newCategory}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'RequestVerificationToken': '@requestToken',
             }
         })
             .then(response =>
