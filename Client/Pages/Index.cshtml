@@ -50,9 +50,9 @@
             </div>
         </nav>
 
-    
+
         @*View Recipes*@
-        <div x-data x-show="show" class="container" >
+        <div x-data x-show="show" class="container">
             <h1 class="text-center my-4" style="color:white">Recipes</h1>
             <div class="row row-cols-md-4 "
                  x-data="
@@ -60,20 +60,7 @@
                  index:0,
                  selectedRecipe:{id:'',title:'',ingredients:'',instructions:'',categories:[]},
                  recipes: [],
-                 init() {
-                 fetch(`https://localhost:7182/recipes`)
-                 .then(response=>
-                response.json())
-                .then(data =>
-                {
-                data.forEach(recipe =>
-                {
-                recipe.ingredients = recipe.ingredients.split('\n');
-                recipe.instructions = recipe.instructions.split('\n');
-                });
-                this.recipes = data;
-                });
-                }
+                 async init() {this.recipes = await getRecipes();}
                 }">
                 <template x-for="recipe in recipes">
                     <div x-data="{cardRecipe:{},init(){this.cardRecipe = recipes[index++]}}">
@@ -92,9 +79,6 @@
                                         <span style="font-size:12px; margin-top:5px; margin-right: 5px;" class="badge rounded-pill bg-light" x-text="category"></span>
                                     </template>
                                 </div>
-
-
-
                             </div>
                             <div x-bind:id="`collapse_${recipe.id}`" class="collapse"
                                  x-bind:aria-labelledby="`heading_${recipe.id}`"
@@ -143,8 +127,8 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="deleteRecipe-form" x-on:submit="
-                              fetch(`https://localhost:7182/recipes/{selectedRecipe.id}`, {
+                                <form id="deleteRecipe-form" x-on:submit.prevent="
+                              fetch(`https://localhost:7182/recipes/${selectedRecipe.id}`, {
                               method: 'DELETE' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
@@ -176,7 +160,7 @@
                                      newInstructions:'',
                                      newIngredients:'',
                                      init() {
-                                     fetch(`https://localhost:7182/categories`)
+                                     fetch(`https: //localhost:7182/categories`)
                                      .then(response=>
                                     response.json()
                                     .then(data=>this.allCategories = data))
@@ -184,7 +168,7 @@
                                     }">
                                     <form id="editRecipe-form"
                                           x-on:submit="
-                                          fetch(`https://localhost:7182/recipes/${selectedRecipe.id}`, {
+                                          fetch(`https: //localhost:7182/recipes/${selectedRecipe.id}`, {
                                           method: 'PUT' ,
                                           headers: {
                                           'Content-Type' : 'application/json' ,
@@ -243,7 +227,7 @@
         <div x-show="!show" x-data="{allCategories:[],
              index:0,
              selectedCategory:'',
-             init(){
+             async init(){
              fetch(`https://localhost:7182/categories`)
              .then(response=>
             response.json()
@@ -284,7 +268,7 @@
                         </div>
                         <div class="modal-body">
                             <form id="deleteCategory-form" x-on:submit="
-                              fetch(`https://localhost:7182/categories/?category={selectedCategory}`, {
+                              fetch(`https://localhost:7182/categories/?category=${selectedCategory}`, {
                               method: 'DELETE' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
@@ -346,7 +330,7 @@
                          allCategories:[],
                          recipe:{Title:'',Ingredients:'',Instructions:'',Categories:[]},
                          init() {
-                         fetch(`https://localhost:7182/categories`)
+                         fetch(`https: //localhost:7182/categories`)
                          .then(response=>
                         response.json()
                         .then(data=>this.allCategories = data))
@@ -354,7 +338,7 @@
                         }">
                         <form id="addRecipe-form"
                               x-on:submit="
-                              fetch(`https://localhost:7182/recipes`, {
+                              fetch(`https: //localhost:7182/recipes`, {
                               method: 'POST' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
@@ -416,7 +400,7 @@
                     <div x-data=" {category:''}">
                         <form id="addCategory-form"
                               x-on:submit="
-                              fetch(`https://localhost:7182/categories?category =${category}`, {
+                              fetch(`https: //localhost:7182/categories?category =${category}`, {
                               method: 'POST' ,
                               headers: {
                               'Content-Type' : 'application/json' ,
@@ -446,9 +430,20 @@
         </div>
     </div>
 
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 </body>
 </html>
+
+<script type="text/javascript">
+    async function getRecipes() {
+        let data = await fetch(`https://localhost:7182/recipes`)
+            .then(response => response.json())
+        data.forEach(recipe => {
+            recipe.ingredients = recipe.ingredients.split('\n');
+            recipe.instructions = recipe.instructions.split('\n');
+        });
+        return data;
+    }
+</script>
