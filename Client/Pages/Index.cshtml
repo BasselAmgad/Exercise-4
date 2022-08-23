@@ -50,7 +50,6 @@
             </div>
         </nav>
 
-
         @*View Recipes*@
         <div x-data x-show="show" class="container">
             <h1 class="text-center my-4" style="color:white">Recipes</h1>
@@ -224,15 +223,12 @@
         </div>
 
         @*categories view*@
-        <div x-show="!show" x-data="{allCategories:[],
-             index:0,
-             selectedCategory:'',
-             async init(){
-             fetch(`https://localhost:7182/categories`)
-             .then(response=>
-            response.json()
-            .then(data=>this.allCategories = data))
-            }}" >
+        <div x-show="!show" x-data="{
+            allCategories:[],
+            index:0,
+            selectedCategory:'',
+            async init(){this.allCategories = await getCategories();}
+            }" >
             <h1 class="text-center my-4" style="color:white">Categories</h1>
             <div x-data class="container">
                 <div class="row row-cols-auto justify-content-center g-4">
@@ -437,7 +433,7 @@
 </html>
 
 <script type="text/javascript">
-    async function getRecipes() {
+    async function getRecipes(){
         let data = await fetch(`https://localhost:7182/recipes`)
             .then(response => response.json())
         data.forEach(recipe => {
@@ -445,5 +441,11 @@
             recipe.instructions = recipe.instructions.split('\n');
         });
         return data;
+    }
+
+    async function getCategories(){
+        let categories = await fetch(`https://localhost:7182/categories`)
+            .then(response => response.json());
+        return categories;
     }
 </script>
