@@ -1,7 +1,9 @@
 ﻿@page
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
+    var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
 <!DOCTYPE html>
 <html lang="en">
