@@ -228,7 +228,7 @@
             index:0,
             selectedCategory:'',
             async init(){this.allCategories = await getCategories();}
-            }" >
+            }">
             <h1 class="text-center my-4" style="color:white">Categories</h1>
             <div x-data class="container">
                 <div class="row row-cols-auto justify-content-center g-4">
@@ -325,31 +325,10 @@
                          {
                          allCategories:[],
                          recipe:{Title:'',Ingredients:'',Instructions:'',Categories:[]},
-                         init() {
-                         fetch(`https: //localhost:7182/categories`)
-                         .then(response=>
-                        response.json()
-                        .then(data=>this.allCategories = data))
-                        }
+                         async init() {this.allCategories = await getCategories();}
                         }">
                         <form id="addRecipe-form"
-                              x-on:submit="
-                              fetch(`https: //localhost:7182/recipes`, {
-                              method: 'POST' ,
-                              headers: {
-                              'Content-Type' : 'application/json' ,
-                              },
-                              body: JSON.stringify(recipe),
-                              })
-                              .then(response=>
-                            response.json())
-                            .then(data => {
-                            console.log('Success:', data);
-                            })
-                            .catch((error) => {
-                            console.error('Error:', error);
-                            });
-                            ">
+                              x-on:submit="await addRecipe(recipe);">
                             <div class="form-floating mb-3">
                                 <input x-model="recipe.Title" type="text" class="form-control" id="title-text" placeholder="Scrambled Eggs">
                                 <label for="title-text" class="col-form-label">Title</label>
@@ -433,7 +412,7 @@
 </html>
 
 <script type="text/javascript">
-    async function getRecipes(){
+    async function getRecipes() {
         let data = await fetch(`https://localhost:7182/recipes`)
             .then(response => response.json())
         data.forEach(recipe => {
@@ -443,9 +422,28 @@
         return data;
     }
 
-    async function getCategories(){
+    async function getCategories() {
         let categories = await fetch(`https://localhost:7182/categories`)
             .then(response => response.json());
         return categories;
+    }
+
+    async function addRecipe(recipe) {
+        console.log(recipe);
+        await fetch(`https://localhost:7182/recipes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(recipe),
+        })
+            .then(response =>
+                response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 </script>
