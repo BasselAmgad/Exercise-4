@@ -383,7 +383,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': '@requestToken',
+                    'antiForgery': '@requestToken',
                 },
                 body: JSON.stringify(recipe),
             })
@@ -438,7 +438,7 @@
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': '@requestToken',
+                    'antiForgery': '@requestToken',
                 }
             })
                 .then(response =>
@@ -456,7 +456,7 @@
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': '@requestToken',
+                    'antiForgery': '@requestToken',
                 },
                 body: JSON.stringify(recipe),
             })
@@ -476,7 +476,7 @@
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': '@requestToken',
+                    'antiForgery': '@requestToken',
                 }
             })
                 .then(response =>
