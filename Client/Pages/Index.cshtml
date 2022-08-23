@@ -126,13 +126,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="deleteRecipe-form" x-on:submit.prevent="
-                              fetch(`https://localhost:7182/recipes/${selectedRecipe.id}`, {
-                              method: 'DELETE' ,
-                              headers: {
-                              'Content-Type' : 'application/json' ,
-                              }
-                              })">
+                                <form id="deleteRecipe-form" x-on:submit="await deleteRecipe(selectedRecipe)">
                                     <p>Are you sure you want to delete <span x-text="selectedRecipe.title"></span></p>
                                 </form>
                             </div>
@@ -263,19 +257,13 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="deleteCategory-form" x-on:submit="
-                              fetch(`https://localhost:7182/categories/?category=${selectedCategory}`, {
-                              method: 'DELETE' ,
-                              headers: {
-                              'Content-Type' : 'application/json' ,
-                              }
-                              })">
+                            <form id="deleteCategory-form" x-on:submit="await deleteCategory(selectedCategory)">
                                 <p>Are you sure you want to delete <span x-text="selectedCategory"></span></p>
                             </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" form="deleteRecipe-form" class="btn btn-danger">Delete</button>
+                            <button type="submit" form="deleteCategory-form" class="btn btn-danger">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -436,6 +424,41 @@
     async function addCategory(category) {
         fetch(`https://localhost:7182/categories?category=${category}`, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response =>
+                response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    async function deleteRecipe(recipe) {
+
+        fetch(`https://localhost:7182/recipes/${recipe.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response =>
+                response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    async function deleteCategory(category) {
+        fetch(`https://localhost:7182/categories/?category=${category}`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             }
