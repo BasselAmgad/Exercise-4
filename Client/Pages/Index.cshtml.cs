@@ -5,11 +5,11 @@ namespace Client.Pages
 {
     public class IndexModel : PageModel
     {
-        public string Url;
+        public string ApiUrl;
 
         public IndexModel(IConfiguration configuration)
         {
-            Url = configuration["Url"];
+            ApiUrl = configuration["Url"];
         }
 
         public void OnGet()

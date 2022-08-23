@@ -4,8 +4,8 @@
 @{
     ViewData["Title"] = "Home page";
     var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
-    var recipeUrl = @Url + "recipes";
-    var categoryUrl = @Url + "categories";
+    var recipeUrl = @Model.ApiUrl + "recipes";
+    var categoryUrl = @Model.ApiUrl + "categories";
 }
 <!DOCTYPE html>
 <html lang="en">
