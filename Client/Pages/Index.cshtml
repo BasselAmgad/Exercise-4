@@ -152,31 +152,10 @@
                                      allCategories:[],
                                      newInstructions:'',
                                      newIngredients:'',
-                                     init() {
-                                     fetch(`https: //localhost:7182/categories`)
-                                     .then(response=>
-                                    response.json()
-                                    .then(data=>this.allCategories = data))
-                                    }
+                                     async init() {this.allCategories = await getCategories()}
                                     }">
                                     <form id="editRecipe-form"
-                                          x-on:submit="
-                                          fetch(`https: //localhost:7182/recipes/${selectedRecipe.id}`, {
-                                          method: 'PUT' ,
-                                          headers: {
-                                          'Content-Type' : 'application/json' ,
-                                          },
-                                          body: JSON.stringify(selectedRecipe),
-                                          })
-                                          .then(response=>
-                                        response.json())
-                                        .then(data => {
-                                        console.log('Success:', data);
-                                        })
-                                        .catch((error) => {
-                                        console.error('Error:', error);
-                                        });
-                                        ">
+                                          x-on:submit="await editRecipe(selectedRecipe)">
                                         <div class="form-floating mb-3">
                                             <input x-model="selectedRecipe.title"
                                                    type="text" class="form-control" id="title-text">
@@ -278,13 +257,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" x-data="{newCategory:''}">
-                            <form id="editCategory-form" x-on:submit="
-                              fetch(`https://localhost:7182/categories/?category={selectedCategory}&newCategory={newCategory}`, {
-                              method: 'PUT' ,
-                              headers: {
-                              'Content-Type' : 'application/json' ,
-                              }
-                              })">
+                            <form id="editCategory-form" x-on:submit.prevent="await editCategory(selectedCategory,newCategory)">
                                 <div class="form-floating mb-3">
                                     <input x-model="newCategory" type="text" class="form-control" id="category-text">
                                     <label for="category-text" class="col-form-label">New title for "<span x-text="selectedCategory"></span>"</label>
@@ -293,7 +266,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" form="editRecipe-form" class="btn btn-danger">Edit</button>
+                            <button type="submit" form="editCategory-form" class="btn btn-danger">Edit</button>
                         </div>
                     </div>
                 </div>
@@ -439,7 +412,6 @@
     }
 
     async function deleteRecipe(recipe) {
-
         fetch(`https://localhost:7182/recipes/${recipe.id}`, {
             method: 'DELETE',
             headers: {
@@ -459,6 +431,42 @@
     async function deleteCategory(category) {
         fetch(`https://localhost:7182/categories/?category=${category}`, {
             method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response =>
+                response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    async function editRecipe(recipe) {
+        fetch(`https://localhost:7182/recipes/${recipe.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(recipe),
+        })
+            .then(response =>
+                response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+    }
+
+    async function editCategory(category, newCategory) {
+        fetch(`https://localhost:7182/categories/?category=${category}&newCategory=${newCategory}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             }
