@@ -18,9 +18,13 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body background="/images/background.jpg" style="background-size: cover; background-attachment: fixed;">
+    <input id="RequestVerificationToken" type="hidden" value="@requestToken" />
     <div x-data="{show:true}">
         @*Navbar*@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -339,7 +343,7 @@
                 <div class="modal-body">
                     <div x-data=" {category:''}">
                         <form id="addCategory-form"
-                              x-on:submit="await addCategory(category)">
+                              x-on:submit.prevent="await addCategory(category)">
                             <div class="mb-3">
                                 <label for="category-text" class="col-form-label">Category Name</label>
                                 <input x-model="category" type="text" class="form-control" id="category-text">
@@ -356,135 +360,134 @@
         </div>
     </div>
 
+    <script type="text/javascript">
+        async function getRecipes() {
+            let data = await fetch('@recipeUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } })
+                .then(response => response.json())
+            data.forEach(recipe => {
+                recipe.ingredients = recipe.ingredients.split('\n');
+                recipe.instructions = recipe.instructions.split('\n');
+            });
+            return data;
+        }
+
+        async function getCategories() {
+            let categories = await fetch('@categoryUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } })
+                .then(response => response.json());
+            return categories;
+        }
+
+        async function addRecipe(recipe) {
+            console.log(recipe);
+            await fetch(`@recipeUrl`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': '@requestToken',
+                },
+                body: JSON.stringify(recipe),
+            })
+                .then(response =>
+                    response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        async function addCategory(category) {
+            fetch(`https://localhost:7182/categories?category=${category}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'antiForgery': '@requestToken',
+                }
+            })
+                .then(response =>
+                    response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        async function deleteRecipe(recipe) {
+            fetch(`@recipeUrl/${recipe.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'antiForgery': '@requestToken',
+                }
+            })
+                .then(response =>
+                    response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        async function deleteCategory(category) {
+            fetch(`@categoryUrl/?category=${category}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': '@requestToken',
+                }
+            })
+                .then(response =>
+                    response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        async function editRecipe(recipe) {
+            fetch(`@recipeUrl/${recipe.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': '@requestToken',
+                },
+                body: JSON.stringify(recipe),
+            })
+                .then(response =>
+                    response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+
+        }
+
+        async function editCategory(category, newCategory) {
+            fetch(`@categoryUrl/?category=${category}&newCategory=${newCategory}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': '@requestToken',
+                }
+            })
+                .then(response =>
+                    response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
 </body>
 </html>
-
-<script type="text/javascript">
-    async function getRecipes() {
-        let data = await fetch('@recipeUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } })
-            .then(response => response.json())
-        data.forEach(recipe => {
-            recipe.ingredients = recipe.ingredients.split('\n');
-            recipe.instructions = recipe.instructions.split('\n');
-        });
-        return data;
-    }
-
-    async function getCategories() {
-        let categories = await fetch('@categoryUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } })
-            .then(response => response.json());
-        return categories;
-    }
-
-    async function addRecipe(recipe) {
-        console.log(recipe);
-        await fetch(`@recipeUrl`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': '@requestToken',
-            },
-            body: JSON.stringify(recipe),
-        })
-            .then(response =>
-                response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-
-    async function addCategory(category) {
-        fetch(`https://localhost:7182/categories?category=${category}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': '@requestToken',
-            }
-        })
-            .then(response =>
-                response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-
-    async function deleteRecipe(recipe) {
-        fetch(`@recipeUrl/${recipe.id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': '@requestToken',
-            }
-        })
-            .then(response =>
-                response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-
-    async function deleteCategory(category) {
-        fetch(`@categoryUrl/?category=${category}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': '@requestToken',
-            }
-        })
-            .then(response =>
-                response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-
-    async function editRecipe(recipe) {
-        fetch(`@recipeUrl/${recipe.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': '@requestToken',
-            },
-            body: JSON.stringify(recipe),
-        })
-            .then(response =>
-                response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-
-    }
-
-    async function editCategory(category, newCategory) {
-        fetch(`@categoryUrl/?category=${category}&newCategory=${newCategory}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': '@requestToken',
-            }
-        })
-            .then(response =>
-                response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-</script>

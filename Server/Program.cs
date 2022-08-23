@@ -10,6 +10,7 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAntiforgery();
 
 var app = builder.Build();
 
@@ -27,17 +28,15 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 
-app.MapGet("recipes", async (HttpContext context, IAntiforgery antiForgery) =>
+app.MapGet("recipes", async () =>
 {
-    await antiForgery.ValidateRequestAsync(context);
     Data data = new(app.Logger);
     var recipes = await data.GetRecipesAsync();
     return Results.Ok(recipes);
 });
 
-app.MapGet("/recipes/{id}", async (HttpContext context, IAntiforgery antiForgery, Guid id) =>
+app.MapGet("/recipes/{id}", async (Guid id) =>
 {
-    await antiForgery.ValidateRequestAsync(context);
     Data data = new(app.Logger);
     Recipe recipe = await data.GetRecipeAsync(id);
     return Results.Ok(recipe);
@@ -68,9 +67,8 @@ app.MapDelete("/recipes/{id}", async (HttpContext context, IAntiforgery antiForg
     return Results.Ok();
 });
 
-app.MapGet("/categories", async (HttpContext context, IAntiforgery antiForgery) =>
+app.MapGet("/categories", async () =>
 {
-    await antiForgery.ValidateRequestAsync(context);
     Data data = new(app.Logger);
     var categories = await data.GetAllCategoriesAsync();
     return Results.Ok(categories);
@@ -79,7 +77,15 @@ app.MapGet("/categories", async (HttpContext context, IAntiforgery antiForgery) 
 
 app.MapPost("/categories", async (HttpContext context, IAntiforgery antiForgery, string category) =>
 {
-    await antiForgery.ValidateRequestAsync(context);
+    try
+    {
+        await antiForgery.ValidateRequestAsync(context);
+    }catch(Exception e)
+    {
+        Console.WriteLine("Hello "+antiForgery.ToString());
+        Console.WriteLine(e.Message);
+    }
+    
     Data data = new(app.Logger);
     await data.AddCategoryAsync(category);
     return Results.Created($"/categories/{category}",category);
